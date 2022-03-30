@@ -4,11 +4,19 @@ import useProyectos from "../hooks/useProyectos";
 import Alerta from "./Alerta";
 import { useParams } from "react-router-dom";
 
-const PRIORIDAD = ['Baja', 'Media', 'Alta'];
+const PRIORIDAD = ["Baja", "Media", "Alta"];
 
 const ModalFormularioTarea = () => {
-  const { modalFormularioTarea, handleModalTarea, mostrarAlerta, alerta, submitTarea} = useProyectos();
+  const {
+    modalFormularioTarea,
+    handleModalTarea,
+    mostrarAlerta,
+    alerta,
+    submitTarea,
+    tarea,
+  } = useProyectos();
 
+  const [id, setId] = useState("");
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [fechaEntrega, setFechaEntrega] = useState("");
@@ -16,29 +24,46 @@ const ModalFormularioTarea = () => {
 
   const params = useParams();
 
-  const handleSubmit = e => {
-      e.preventDefault();
-      if([nombre, descripcion, fechaEntrega, prioridad].includes('')) {
-        mostrarAlerta({
-            msg: 'Todos los campos son obligatorios',
-            error: true
-        })
-        return;
-      }
-      submitTarea({
-          nombre,
-          descripcion,
-          fechaEntrega,
-          prioridad,
-          proyecto: params.id,
+  useEffect(() => {
+    if (tarea?._id) {
+      setId(tarea._id);
+      setNombre(tarea.nombre);
+      setDescripcion(tarea.descripcion);
+      setFechaEntrega(tarea.fechaEntrega?.split("T")[0]);
+      setPrioridad(tarea.prioridad);
+      return;
+    }
+    setId("");
+    setNombre("");
+    setDescripcion("");
+    setFechaEntrega("");
+    setPrioridad("");
+  }, [tarea]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if ([nombre, descripcion, fechaEntrega, prioridad].includes("")) {
+      mostrarAlerta({
+        msg: "Todos los campos son obligatorios",
+        error: true,
       });
+      return;
+    }
+    submitTarea({
+      id,
+      nombre,
+      descripcion,
+      fechaEntrega,
+      prioridad,
+      proyecto: params.id,
+    });
 
-
-    setNombre('')
-    setDescripcion('')
-    setFechaEntrega('')
-    setPrioridad('')
-  }
+    setId("");
+    setNombre("");
+    setDescripcion("");
+    setFechaEntrega("");
+    setPrioridad("");
+  };
 
   const { msg } = alerta;
 
@@ -109,10 +134,10 @@ const ModalFormularioTarea = () => {
                       as="h3"
                       className="text-lg leading-6 font-bold text-gray-900"
                     >
-                      Crear Tarea
+                      {id ? "Editar Tarea" : "Crear Tarea"}
                     </Dialog.Title>
 
-                    { msg && <Alerta alerta={alerta} /> }
+                    {msg && <Alerta alerta={alerta} />}
 
                     <form className="my-10" onSubmit={handleSubmit}>
                       <div className="mb-5">
@@ -173,23 +198,23 @@ const ModalFormularioTarea = () => {
                           Prioridad
                         </label>
                         <select
-                            id="prioridad"
-                            className="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
-                            value={prioridad}
-                            onChange={ e => setPrioridad(e.target.value) }
+                          id="prioridad"
+                          className="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
+                          value={prioridad}
+                          onChange={(e) => setPrioridad(e.target.value)}
                         >
-                            <option value="">-- Seleccionar</option>
-                            { PRIORIDAD.map(option => (
-                                <option key={option}> { option } </option>
-                            )) }
+                          <option value="">-- Seleccionar</option>
+                          {PRIORIDAD.map((option) => (
+                            <option key={option}> {option} </option>
+                          ))}
                         </select>
                       </div>
 
-                      <input type="submit"
-                      className="bg-sky-600 hover:bg-sky-700 w-full p-3 text-white uppercase font-bold cursor-pointer transition-colors rounded text-sm"
-                      value='Crear Tarea'
-                       />
-
+                      <input
+                        type="submit"
+                        className="bg-sky-600 hover:bg-sky-700 w-full p-3 text-white uppercase font-bold cursor-pointer transition-colors rounded text-sm"
+                        value={id ? "Guardar Cambios" : "Crear Tarea"}
+                      />
                     </form>
                   </div>
                 </div>
