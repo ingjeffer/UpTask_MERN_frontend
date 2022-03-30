@@ -1,162 +1,200 @@
-import { useState, useEffect, createContext } from 'react';
-import clienteAxios from '../../config/clienteAxios';
-import { useNavigate } from 'react-router-dom';
-
+import { useState, useEffect, createContext } from "react";
+import clienteAxios from "../../config/clienteAxios";
+import { useNavigate } from "react-router-dom";
 
 const ProyectosContext = createContext();
 
 const ProyectosProvider = ({ children }) => {
-    const [proyectos, setProyectos] = useState([]);
-    const [alerta, setAlerta] = useState({});
-    const [proyecto, setProyecto] = useState({});
-    const [cargando, setCargando] = useState(false);
+  const [proyectos, setProyectos] = useState([]);
+  const [alerta, setAlerta] = useState({});
+  const [proyecto, setProyecto] = useState({});
+  const [cargando, setCargando] = useState(false);
+  const [modalFormularioTarea, setModalFormularioTarea] = useState(false);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const obtenerProyectos = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) return
-    
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    }
-                }
+  useEffect(() => {
+    const obtenerProyectos = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-                const { data } = await clienteAxios('/proyectos', config);
-                setProyectos(data);
-    
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        obtenerProyectos();
-    }, []);
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        };
 
-    const mostrarAlerta = alerta => {
-        setAlerta(alerta)
+        const { data } = await clienteAxios("/proyectos", config);
+        setProyectos(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    obtenerProyectos();
+  }, []);
 
-        setTimeout(() => {
-            setAlerta({})
-        }, 5000)
+  const mostrarAlerta = (alerta) => {
+    setAlerta(alerta);
+
+    setTimeout(() => {
+      setAlerta({});
+    }, 5000);
+  };
+
+  const submitProyecto = async (proyecto) => {
+    const { id } = proyecto;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const { data } = !!id
+        ? await clienteAxios.put(`/proyectos/${proyecto.id}`, proyecto, config)
+        : await clienteAxios.post("/proyectos", proyecto, config);
+      let messageAlerta = "";
+      // console.log(id);
+      if (!!id) {
+        // Sincronizar el state
+        const proyectosActualizados = proyectos.map((proyectoState) =>
+          proyectoState._id === data._id ? data : proyectoState
+        );
+        setProyectos(proyectosActualizados);
+        messageAlerta = "Proyecto Actualizado correctamente";
+      } else {
+        setProyectos([...proyectos, data]);
+        messageAlerta = "Proyecto Creado correctamente";
+      }
+      setAlerta({
+        msg: messageAlerta,
+        error: false,
+      });
+
+      setTimeout(() => {
+        setAlerta({});
+        navigate("/proyectos");
+      }, 3000);
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    const submitProyecto = async proyecto => {
-        const { id } = proyecto;
+  const obtenerProyecto = async (id) => {
+    setCargando(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) return
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                }
-            }
-
-            const { data } = !!id ? await clienteAxios.put(`/proyectos/${proyecto.id}`, proyecto, config) : await clienteAxios.post('/proyectos', proyecto, config);
-            let messageAlerta = '';
-            // console.log(id);
-            if (!!id) {
-                // Sincronizar el state
-                const proyectosActualizados = proyectos.map(proyectoState => proyectoState._id === data._id ? data : proyectoState)
-                setProyectos(proyectosActualizados)
-                messageAlerta = 'Proyecto Actualizado correctamente';
-            } else {
-                setProyectos([...proyectos, data]);
-                messageAlerta = 'Proyecto Creado correctamente';
-            }
-            setAlerta({
-                msg: messageAlerta,
-                error: false,
-            })
-
-            setTimeout(() => {
-                setAlerta({})
-                navigate('/proyectos')
-            }, 3000)
-        } catch (error) {
-            console.log(error);
-        }
+      const { data } = await clienteAxios(`/proyectos/${id}`, config);
+      setProyecto(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setCargando(false);
     }
+  };
 
-    const obtenerProyecto = async id => {
-        setCargando(true)
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) return
+  const eliminarProyecto = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                }
-            }
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-            const { data } = await clienteAxios(`/proyectos/${id}`, config);
-            setProyecto(data);
-        } catch (error) {
-            console.log(error);
-        }
-        finally {
-            setCargando(false);
-        }
+      const { data } = await clienteAxios.delete(`/proyectos/${id}`, config);
+
+      // Sincronizar el state
+      const proyectosActualizados = proyectos.filter(
+        (proyectoState) => proyectoState._id !== id
+      );
+      setProyectos(proyectosActualizados);
+
+      setAlerta({
+        msg: data.msg,
+        error: false,
+      });
+
+      setTimeout(() => {
+        setAlerta({});
+        navigate("/proyectos");
+      }, 3000);
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    const eliminarProyecto = async id => {
-        try {
-            const token = localStorage.getItem('token')
-            if(!token) return
+  const handleModalTarea = () => {
+    setModalFormularioTarea(!modalFormularioTarea);
+  }
 
-            const config = {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            }
+  const submitTarea = async tarea => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+  
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        };
 
-            const { data } = await clienteAxios.delete(`/proyectos/${id}`, config)
+        const { data } = await clienteAxios.post(`/tareas`, tarea, config);
 
-            // Sincronizar el state
-            const proyectosActualizados = proyectos.filter(proyectoState => proyectoState._id !== id )
-            setProyectos(proyectosActualizados)
+        // Agregar la tarea al state
+        const proyectoActualizado = {...proyecto};
+        proyectoActualizado.tareas = [...proyecto.tareas, data];
 
-            setAlerta({
-                msg: data.msg,
-                error: false
-            })
+        setProyecto(proyectoActualizado);
+        setAlerta({})
+        setModalFormularioTarea(false)
+  
+      } catch (error) {
+        console.log(error);
+      }
+  }
 
-            setTimeout(() => {
-                setAlerta({})
-                navigate('/proyectos')
-            }, 3000);
-        } catch (error) {
-            console.log(error)
-        }
-    }
+  return (
+    <ProyectosContext.Provider
+      value={{
+        proyectos,
+        mostrarAlerta,
+        alerta,
+        submitProyecto,
+        obtenerProyecto,
+        proyecto,
+        cargando,
+        eliminarProyecto,
+        modalFormularioTarea,
+        handleModalTarea,
+        submitTarea,
+      }}
+    >
+      {children}
+    </ProyectosContext.Provider>
+  );
+};
 
-    return (
-        <ProyectosContext.Provider value={{
-            proyectos,
-            mostrarAlerta,
-            alerta,
-            submitProyecto,
-            obtenerProyecto,
-            proyecto,
-            cargando,
-            eliminarProyecto,
-        }}>
-            { children }
-        </ProyectosContext.Provider>
-    )
-}
-
-export {
-    ProyectosProvider
-}
+export { ProyectosProvider };
 
 export default ProyectosContext;
