@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import clienteAxios from "../../config/clienteAxios";
+import clienteAxios from "../config/clienteAxios";
 import Alerta from "../components/Alerta";
 
 const ConfirmarCuenta = () => {
@@ -8,7 +8,6 @@ const ConfirmarCuenta = () => {
   const [cuentaConfirmada, setCuentaConfirmada] = useState(false);
 
   const params = useParams();
-  // console.log(params);
   const { id } = params;
 
   useEffect(() => {
@@ -16,12 +15,11 @@ const ConfirmarCuenta = () => {
       try {
         const url = `/usuarios/confirmar/${id}`;
         const { data } = await clienteAxios(url);
-        // console.log(data);
+
         setAlerta({
           msg: data.msg,
           error: false,
         });
-
         setCuentaConfirmada(true);
       } catch (error) {
         setAlerta({
@@ -30,7 +28,6 @@ const ConfirmarCuenta = () => {
         });
       }
     };
-
     confirmarCuenta();
   }, []);
 
@@ -39,7 +36,7 @@ const ConfirmarCuenta = () => {
   return (
     <>
       <h1 className="text-sky-600 font-black text-6xl capitalize">
-        Reestablece tu password y no pierdas acceso a tus{" "}
+        Confirma tu cuenta y Comienza a crear tus {""}
         <span className="text-slate-700">proyectos</span>
       </h1>
 

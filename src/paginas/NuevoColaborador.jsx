@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Alerta from "../components/Alerta";
 import useProyectos from "../hooks/useProyectos";
-import FormularioColaborador from "./FormularioColaborador";
+import FormularioColaborador from "../components/FormularioColaborador";
 
 const NuevoColaborador = () => {
   const {
@@ -19,13 +19,12 @@ const NuevoColaborador = () => {
     obtenerProyecto(params.id);
   }, []);
 
-  if(!proyecto?._id) return <Alerta alerta={alerta} />
+  if (!proyecto?._id) return <Alerta alerta={alerta} />;
 
   return (
     <>
       <h1 className="text-4xl font-black">
-        {" "}
-        Añadir Colaborador(a) al Proyecto: {proyecto.nombre}{" "}
+        Añadir Colaborador(a) al Proyecto: {proyecto.nombre}
       </h1>
 
       <div className="mt-10 flex justify-center">
@@ -33,24 +32,28 @@ const NuevoColaborador = () => {
       </div>
 
       {cargando ? (
-        <div className="text-center">cargando...</div>
+        <p className="text-center">cargando...</p>
       ) : (
-        colaborador._id && (
+        colaborador?._id && (
           <div className="flex justify-center mt-10">
-            <div className="bg-white py-10 px-5 md:w-1/2 rounded-lg shadow">
+            <div className="bg-white py-10 px-5 md:w-1/2 rounded-lg shadow w-full">
               <h2 className="text-center mb-10 text-2xl font-bold">
-                {" "}
-                Resultado:{" "}
+                Resultado:
               </h2>
+
               <div className="flex justify-between items-center">
-                {colaborador.nombre}
+                <p>{colaborador.nombre}</p>
 
                 <button
-                  onClick={() => agregarColaborador({ email: colaborador.email })}
                   type="button"
                   className="bg-slate-500 px-5 py-2 rounded-lg uppercase text-white font-bold text-sm"
+                  onClick={() =>
+                    agregarColaborador({
+                      email: colaborador.email,
+                    })
+                  }
                 >
-                  Agregar al Proyecto{" "}
+                  Agregar al Proyecto
                 </button>
               </div>
             </div>

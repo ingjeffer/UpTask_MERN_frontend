@@ -11,7 +11,6 @@ const FormularioProyecto = () => {
   const [cliente, setCliente] = useState("");
 
   const params = useParams();
-
   const { mostrarAlerta, alerta, submitProyecto, proyecto } = useProyectos();
 
   useEffect(() => {
@@ -24,25 +23,20 @@ const FormularioProyecto = () => {
     }
   }, [params]);
 
-  const handlerSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if ([nombre, descripcion, fechaEntrega, cliente].includes("")) {
       mostrarAlerta({
-        msg: "Todos los campos son obligatorios",
+        msg: "Todos los Campos son Obligatorios",
         error: true,
       });
+
       return;
     }
 
     // Pasar los datos hacia el provider
-    await submitProyecto({
-      id,
-      nombre,
-      descripcion,
-      fechaEntrega,
-      cliente,
-    });
+    await submitProyecto({ id, nombre, descripcion, fechaEntrega, cliente });
 
     setId(null);
     setNombre("");
@@ -56,20 +50,22 @@ const FormularioProyecto = () => {
   return (
     <form
       className="bg-white py-10 px-5 md:w-1/2 rounded-lg shadow"
-      onSubmit={handlerSubmit}
+      onSubmit={handleSubmit}
     >
       {msg && <Alerta alerta={alerta} />}
+
       <div className="mb-5">
         <label
-          htmlFor="nombre"
           className="text-gray-700 uppercase font-bold text-sm"
+          htmlFor="nombre"
         >
           Nombre Proyecto
         </label>
+
         <input
-          className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
-          type="text"
           id="nombre"
+          type="text"
+          className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
           placeholder="Nombre del Proyecto"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
@@ -78,16 +74,16 @@ const FormularioProyecto = () => {
 
       <div className="mb-5">
         <label
-          htmlFor="descripcion"
           className="text-gray-700 uppercase font-bold text-sm"
+          htmlFor="descripcion"
         >
-          Descripcion Proyecto
+          Descripción
         </label>
+
         <textarea
-          className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
-          type="text"
           id="descripcion"
-          placeholder="Descripcion del Proyecto"
+          className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
+          placeholder="Descripción del Proyecto"
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
         />
@@ -95,15 +91,16 @@ const FormularioProyecto = () => {
 
       <div className="mb-5">
         <label
-          htmlFor="fecha-entrega"
           className="text-gray-700 uppercase font-bold text-sm"
+          htmlFor="fecha-entrega"
         >
           Fecha Entrega
         </label>
+
         <input
-          className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
-          type="date"
           id="fecha-entrega"
+          type="date"
+          className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
           value={fechaEntrega}
           onChange={(e) => setFechaEntrega(e.target.value)}
         />
@@ -111,15 +108,16 @@ const FormularioProyecto = () => {
 
       <div className="mb-5">
         <label
-          htmlFor="cliente"
           className="text-gray-700 uppercase font-bold text-sm"
+          htmlFor="cliente"
         >
           Nombre Cliente
         </label>
+
         <input
-          className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
-          type="text"
           id="cliente"
+          type="text"
+          className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
           placeholder="Nombre del Cliente"
           value={cliente}
           onChange={(e) => setCliente(e.target.value)}

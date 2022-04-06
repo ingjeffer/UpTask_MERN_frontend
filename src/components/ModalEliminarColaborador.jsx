@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import useProyectos from "../hooks/useProyectos";
 
-const ModalEliminarColaborador = () => {
+const modalEliminarColaborador = () => {
   const {
     handleModalEliminarColaborador,
     modalEliminarColaborador,
@@ -125,4 +125,4 @@ const ModalEliminarColaborador = () => {
   );
 };
 
-export default ModalEliminarColaborador;
+export default modalEliminarColaborador;
